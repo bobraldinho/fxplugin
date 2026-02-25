@@ -120,24 +120,36 @@
       });
     };
 
-    this.find = function(filmix_id) {
-      var url = api_url;
+  this.find = function (filmix_id) {
+  var url = api_url;
 
-      end_search(filmix_id);
+  end_search(filmix_id);
 
-      function end_search(filmix_id) {
-        network.clear();
-        network.timeout(10000);
-        network.silent(url + 'post/' + filmix_id + '?' + dev_token + fxapi_token, function(found) {
-          if (found && Object.keys(found).length) {
-            success(found);
-            component.loading(false);
-          } else component.doesNotAnswer();
-        }, function(a, c) {
+  function end_search(filmix_id) {
+    network.clear();
+    network.timeout(10000);
+
+    network.silent(
+      url + 'post/' + filmix_id + '?' + dev_token + fxapi_token,
+      function (found) {
+        console.log('[FXAPI] post response:', found);
+
+        if (found && found.player_links) {
+          console.log('[FXAPI] player_links:', found.player_links);
+          success(found);
+          component.loading(false);
+        } else {
+          console.log('[FXAPI] NO player_links in response');
           component.doesNotAnswer();
-        });
+        }
+      },
+      function (a, c) {
+        console.log('[FXAPI] request error:', a, c);
+        component.doesNotAnswer();
       }
-    };
+    );
+  }
+};
 
     this.extendChoice = function(saved) {
       Lampa.Arrays.extend(choice, saved, true);
